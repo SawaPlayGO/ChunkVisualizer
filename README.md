@@ -40,7 +40,7 @@ Built using modern packets and **Display Entities**, these blocks have no collis
 ---
 
 ## ⚙️ Installation
-1. Download the latest `.jar` file from the [Releases](https://github.com/SawaPlago/ChunkVisualizer/releases) page.
+1. Download the latest `.jar` file from the [Releases](https://github.com/SawaPlayGO/ChunkVisualizer/releases/tag/v0.1) page.
 2. Place it into your server's `plugins` folder.
 3. Restart the server or load it using a plugin manager.
 
