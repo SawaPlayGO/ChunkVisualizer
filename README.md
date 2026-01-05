@@ -49,8 +49,3 @@ Built using modern packets and **Display Entities**, these blocks have no collis
 ## 📝 Roadmap
 * [ ] Persistent user settings storage (Database/Flatfile support).
 * [ ] Color support for boundary block outlines/highlights.
-
----
-
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
