@@ -20,7 +20,6 @@ gui:
   lore-lmb: "&eLMB: &fDecrease height (-1)"
   lore-rmb: "&eRMB: &fIncrease height (+1)"
   lore-shift: "&eShift + Click: &fToggle ON/OFF"
-  # Новые строки для выбора блока
   block-name: "&eVisualization Material"
   block-lore:
     - "&7Current block: &f%material%"
