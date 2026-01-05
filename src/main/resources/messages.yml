@@ -1,0 +1,31 @@
+# ChunkVisualizer Plugin Messages
+menu-title: "&8Visualization Settings"
+chunk-updated: "&aChunk visualization updated!"
+only-players: "&cOnly players can use this command!"
+no-permission: "&cYou do not have permission to execute this command."
+
+commands:
+  unknown: "&cUnknown subcommand. Use /cv help"
+  reload-success: "&a[CV] &fConfiguration successfully reloaded!"
+  help-header: "&8&m      &e [ ChunkVisualizer ] &8&m      "
+  help-settings: "&e/cv settings &7- Open visualization settings"
+  help-reload: "&e/cv reload &7- Reload plugin messages"
+
+# GUI Button Settings /cv
+gui:
+  height-name: "&eHighlight Height: &b%height%"
+  status-on: "&aON"
+  status-off: "&cOFF"
+  lore-status: "&7Status: "
+  lore-lmb: "&eLMB: &fDecrease height (-1)"
+  lore-rmb: "&eRMB: &fIncrease height (+1)"
+  lore-shift: "&eShift + Click: &fToggle ON/OFF"
+  # Новые строки для выбора блока
+  block-name: "&eVisualization Material"
+  block-lore:
+    - "&7Current block: &f%material%"
+    - ""
+    - "&eClick this slot with a block"
+    - "&eto change the material."
+    - ""
+    - "&cRMB: &fReset to Glowstone"

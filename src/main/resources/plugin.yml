@@ -1,0 +1,11 @@
+name: ChunkVisualizer
+version: '0.1'
+main: ru.sawaplago.chunkVisualizer.ChunkVisualizer
+api-version: '1.21'
+authors: [ SawaPlayGO ]
+description: Highlights chunk borders using visual effects.
+website: https://github.com/SawaPlayGO
+commands:
+  cv:
+    usage: /cv [reload|settings]
+    description: Open settings or reload plugin for change message.yml.

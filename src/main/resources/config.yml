@@ -1,0 +1,13 @@
+# ChunkVisualizer Main Configuration
+
+# A full server restart is required to apply changes
+settings:
+  # Default height for the visualization relative to the player
+  default-height: 1
+
+  # Should the visualization be enabled by default when a player joins for the first time?
+  default-enabled: true
+
+  # Default block material for the display (Must be a valid Bukkit Material name)
+  # See: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+  default-material: "GLOWSTONE"
