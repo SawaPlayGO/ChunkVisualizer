@@ -92,9 +92,4 @@ public class ItemDisplayChunkHighlighter {
 
         activeEntityIds.clear();
     }
-
-    private ItemType getPacketItemType(Material bukkitMaterial) {
-        String key = bukkitMaterial.getKey().toString();
-        return ItemTypes.getByName(key);
-    }
 }

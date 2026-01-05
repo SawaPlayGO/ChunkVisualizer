@@ -27,16 +27,6 @@ public class UserSettings {
         }
     }
 
-    public static void loadPlayerSettings(UUID uuid, Integer height, Boolean isEnabled, String materialName) {
-        if (height != null) heights.put(uuid, height);
-        if (isEnabled != null) enabled.put(uuid, isEnabled);
-
-        if (materialName != null) {
-            Material m = Material.matchMaterial(materialName.toUpperCase());
-            if (m != null && m.isBlock()) playerMaterials.put(uuid, m);
-        }
-    }
-
     public static int getHeight(UUID uuid) {
         return heights.getOrDefault(uuid, defaultHeight);
     }

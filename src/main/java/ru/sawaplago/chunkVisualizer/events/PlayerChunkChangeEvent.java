@@ -22,10 +22,6 @@ public class PlayerChunkChangeEvent extends Event {
         return player;
     }
 
-    public Chunk getFromChunk() {
-        return fromChunk;
-    }
-
     public Chunk getToChunk() {
         return toChunk;
     }

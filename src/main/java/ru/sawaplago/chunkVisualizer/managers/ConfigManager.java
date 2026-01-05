@@ -22,10 +22,6 @@ public class ConfigManager {
         config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public FileConfiguration getConfig() {
-        return config;
-    }
-
     public int getDefaultHeight() { return config.getInt("settings.default-height", 10); }
     public boolean isDefaultEnabled() { return config.getBoolean("settings.default-enabled", true); }
     public String getDefaultMaterial() { return config.getString("settings.default-material", "GLOWSTONE"); }
