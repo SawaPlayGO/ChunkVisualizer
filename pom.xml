@@ -17,6 +17,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
@@ -102,7 +112,8 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                                      tofile="C:/work/servers/plugins/${project.artifactId}.jar"/>
+                                      tofile="C:/work/servers/plugins/${project.artifactId}.jar"
+                                      failonerror="false"/>
                             </target>
                         </configuration>
                     </execution>
