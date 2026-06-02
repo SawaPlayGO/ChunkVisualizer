@@ -6,7 +6,7 @@
 
     <groupId>ru.sawaplago</groupId>
     <artifactId>ChunkVisualizer</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>ChunkVisualizer</name>
