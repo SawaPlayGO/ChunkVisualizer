@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
@@ -20,4 +20,4 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Checkstyle
-        run: mvn -B checkstyle:check
+        run: mvn -B spotless:check

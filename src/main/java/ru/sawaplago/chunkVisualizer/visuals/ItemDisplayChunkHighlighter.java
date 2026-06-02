@@ -11,15 +11,14 @@ import com.github.retrooper.packetevents.protocol.world.Location;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
-import ru.sawaplago.chunkVisualizer.objects.Chunk;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+import ru.sawaplago.chunkVisualizer.objects.Chunk;
 
 public class ItemDisplayChunkHighlighter {
     private static final byte GLOWING_FLAG = 0x40;
@@ -48,7 +47,13 @@ public class ItemDisplayChunkHighlighter {
 
         List<Vector> angles = chunk.getAngleChunk();
         for (Vector vector : angles) {
-            Location loc = new Location(vector.getX(), player.getLocation().getY() + height, vector.getZ(), 0, 0);
+            Location loc =
+                    new Location(
+                            vector.getX(),
+                            player.getLocation().getY() + height,
+                            vector.getZ(),
+                            0,
+                            0);
             int id = spawnSinglePoint(loc);
             activeEntityIds.add(id);
         }
@@ -58,13 +63,14 @@ public class ItemDisplayChunkHighlighter {
         int entityId = ID_HOLDER.getAndIncrement();
         UUID uuid = UUID.randomUUID();
 
-        WrapperPlayServerSpawnEntity spawnPacket = new WrapperPlayServerSpawnEntity(
-                entityId, uuid, EntityTypes.ITEM_DISPLAY, loc, 0f, 0, null
-        );
+        WrapperPlayServerSpawnEntity spawnPacket =
+                new WrapperPlayServerSpawnEntity(
+                        entityId, uuid, EntityTypes.ITEM_DISPLAY, loc, 0f, 0, null);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, spawnPacket);
 
         List<EntityData<?>> metaList = new ArrayList<>();
-        metaList.add(new EntityData<>(0, EntityDataTypes.BYTE, (byte) (GLOWING_FLAG | INVISIBLE_FLAG)));
+        metaList.add(
+                new EntityData<>(0, EntityDataTypes.BYTE, (byte) (GLOWING_FLAG | INVISIBLE_FLAG)));
 
         String materialName = this.material.getKey().toString();
         ItemType type = ItemTypes.getByName(materialName);
@@ -75,9 +81,12 @@ public class ItemDisplayChunkHighlighter {
 
         ItemStack displayItem = ItemStack.builder().type(type).amount(1).build();
         metaList.add(new EntityData<>(METADATA_ITEM_INDEX, EntityDataTypes.ITEMSTACK, displayItem));
-        metaList.add(new EntityData<>(METADATA_DISPLAY_TYPE_INDEX, EntityDataTypes.BYTE, DISPLAY_TYPE_HEAD));
+        metaList.add(
+                new EntityData<>(
+                        METADATA_DISPLAY_TYPE_INDEX, EntityDataTypes.BYTE, DISPLAY_TYPE_HEAD));
 
-        WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(entityId, metaList);
+        WrapperPlayServerEntityMetadata metadataPacket =
+                new WrapperPlayServerEntityMetadata(entityId, metaList);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, metadataPacket);
 
         return entityId;
@@ -87,7 +96,8 @@ public class ItemDisplayChunkHighlighter {
         if (activeEntityIds.isEmpty()) return;
 
         int[] idsArray = activeEntityIds.stream().mapToInt(Integer::intValue).toArray();
-        WrapperPlayServerDestroyEntities destroyPacket = new WrapperPlayServerDestroyEntities(idsArray);
+        WrapperPlayServerDestroyEntities destroyPacket =
+                new WrapperPlayServerDestroyEntities(idsArray);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, destroyPacket);
 
         activeEntityIds.clear();

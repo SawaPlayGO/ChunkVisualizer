@@ -1,25 +1,26 @@
 package ru.sawaplago.chunkVisualizer.commands.sub;
 
+import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import ru.sawaplago.chunkVisualizer.ChunkVisualizer;
 import ru.sawaplago.chunkVisualizer.commands.SubCommand;
 import ru.sawaplago.chunkVisualizer.menus.SettingsMenu;
 
-import java.util.List;
-
 public class SettingsSubCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!sender.hasPermission("chunkvisualizer.settings")) {
-            sender.sendMessage(ChunkVisualizer.getInstance().getMessageManager().getMessage("no-permission"));
+            sender.sendMessage(
+                    ChunkVisualizer.getInstance().getMessageManager().getMessage("no-permission"));
             return;
         }
 
         if (sender instanceof Player player) {
             new SettingsMenu().open(player);
         } else {
-            sender.sendMessage(ChunkVisualizer.getInstance().getMessageManager().getMessage("only-players"));
+            sender.sendMessage(
+                    ChunkVisualizer.getInstance().getMessageManager().getMessage("only-players"));
         }
     }
 

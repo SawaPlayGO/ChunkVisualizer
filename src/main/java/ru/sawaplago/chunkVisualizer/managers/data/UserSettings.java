@@ -1,6 +1,8 @@
 package ru.sawaplago.chunkVisualizer.managers.data;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bukkit.Material;
 import ru.sawaplago.chunkVisualizer.ChunkVisualizer;
 import ru.sawaplago.chunkVisualizer.managers.ConfigManager;
@@ -16,6 +18,10 @@ public class UserSettings {
 
     public static UserSettings defaultSettings(String playerName) {
         ConfigManager configManager = ChunkVisualizer.getInstance().getConfigManager();
-        return new UserSettings(playerName, configManager.getDefaultHeight(), configManager.isDefaultIsEnabled(), configManager.getDefaultMaterial());
+        return new UserSettings(
+                playerName,
+                configManager.getDefaultHeight(),
+                configManager.isDefaultIsEnabled(),
+                configManager.getDefaultMaterial());
     }
 }

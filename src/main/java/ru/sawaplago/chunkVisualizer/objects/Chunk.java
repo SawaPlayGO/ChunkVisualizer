@@ -1,10 +1,8 @@
 package ru.sawaplago.chunkVisualizer.objects;
 
-
+import java.util.ArrayList;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-
-import java.util.ArrayList;
 
 public class Chunk {
     private final Vector startAngleVector;
@@ -12,7 +10,6 @@ public class Chunk {
 
     public Chunk(int startAngleX, int startAngleZ) {
         this.startAngleVector = new Vector(startAngleX, 0, startAngleZ);
-
     }
 
     public Vector getStartChunkPositionVector() {
@@ -22,10 +19,21 @@ public class Chunk {
     public ArrayList<Vector> getAngleChunk() {
         ArrayList<Vector> chunks = new ArrayList<>();
         Vector nwVector = new Vector(this.startAngleVector.getX(), 0, this.startAngleVector.getZ());
-        Vector neVector = new Vector(this.startAngleVector.getX() + CHUNK_SIZE, 0, this.startAngleVector.getZ());
-        Vector swVector = new Vector(this.startAngleVector.getX(), 0, this.startAngleVector.getZ() + CHUNK_SIZE);
-        Vector seVector = new Vector(this.startAngleVector.getX() + CHUNK_SIZE, 0, this.startAngleVector.getZ() + CHUNK_SIZE);
-        chunks.add(nwVector); chunks.add(neVector); chunks.add(swVector); chunks.add(seVector);
+        Vector neVector =
+                new Vector(
+                        this.startAngleVector.getX() + CHUNK_SIZE, 0, this.startAngleVector.getZ());
+        Vector swVector =
+                new Vector(
+                        this.startAngleVector.getX(), 0, this.startAngleVector.getZ() + CHUNK_SIZE);
+        Vector seVector =
+                new Vector(
+                        this.startAngleVector.getX() + CHUNK_SIZE,
+                        0,
+                        this.startAngleVector.getZ() + CHUNK_SIZE);
+        chunks.add(nwVector);
+        chunks.add(neVector);
+        chunks.add(swVector);
+        chunks.add(seVector);
         return chunks;
     }
 
@@ -41,12 +49,27 @@ public class Chunk {
 
     public static ArrayList<Vector> getAngleChunk(Chunk chunk) {
         ArrayList<Vector> chunks = new ArrayList<>();
-        Vector nwVector = new Vector(chunk.startAngleVector.getX(), 0, chunk.startAngleVector.getZ());
-        Vector neVector = new Vector(chunk.startAngleVector.getX() + CHUNK_SIZE, 0, chunk.startAngleVector.getZ());
-        Vector swVector = new Vector(chunk.startAngleVector.getX(), 0, chunk.startAngleVector.getZ() + CHUNK_SIZE);
-        Vector seVector = new Vector(chunk.startAngleVector.getX() + CHUNK_SIZE, 0, chunk.startAngleVector.getZ() + CHUNK_SIZE);
-        chunks.add(nwVector); chunks.add(neVector); chunks.add(swVector); chunks.add(seVector);
+        Vector nwVector =
+                new Vector(chunk.startAngleVector.getX(), 0, chunk.startAngleVector.getZ());
+        Vector neVector =
+                new Vector(
+                        chunk.startAngleVector.getX() + CHUNK_SIZE,
+                        0,
+                        chunk.startAngleVector.getZ());
+        Vector swVector =
+                new Vector(
+                        chunk.startAngleVector.getX(),
+                        0,
+                        chunk.startAngleVector.getZ() + CHUNK_SIZE);
+        Vector seVector =
+                new Vector(
+                        chunk.startAngleVector.getX() + CHUNK_SIZE,
+                        0,
+                        chunk.startAngleVector.getZ() + CHUNK_SIZE);
+        chunks.add(nwVector);
+        chunks.add(neVector);
+        chunks.add(swVector);
+        chunks.add(seVector);
         return chunks;
     }
-
 }

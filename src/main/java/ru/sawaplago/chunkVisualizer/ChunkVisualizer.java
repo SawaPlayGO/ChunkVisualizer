@@ -15,8 +15,7 @@ import ru.sawaplago.chunkVisualizer.managers.UserSettingsManager;
 @Getter
 public final class ChunkVisualizer extends JavaPlugin {
 
-    @Getter
-    private static ChunkVisualizer instance;
+    @Getter private static ChunkVisualizer instance;
     private MessageManager messageManager;
     private ConfigManager configManager;
     private DatabaseManager databaseManager;

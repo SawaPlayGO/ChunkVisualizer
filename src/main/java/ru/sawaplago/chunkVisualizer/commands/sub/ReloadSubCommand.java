@@ -1,12 +1,11 @@
 package ru.sawaplago.chunkVisualizer.commands.sub;
 
+import java.util.List;
 import org.bukkit.command.CommandSender;
 import ru.sawaplago.chunkVisualizer.ChunkVisualizer;
 import ru.sawaplago.chunkVisualizer.commands.SubCommand;
 import ru.sawaplago.chunkVisualizer.managers.ConfigManager;
 import ru.sawaplago.chunkVisualizer.managers.MessageManager;
-
-import java.util.List;
 
 public class ReloadSubCommand implements SubCommand {
 

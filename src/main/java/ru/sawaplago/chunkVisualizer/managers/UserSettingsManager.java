@@ -1,10 +1,9 @@
 package ru.sawaplago.chunkVisualizer.managers;
 
-import ru.sawaplago.chunkVisualizer.managers.data.UserSettings;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import ru.sawaplago.chunkVisualizer.managers.data.UserSettings;
 
 public class UserSettingsManager {
     private final Map<UUID, UserSettings> cache = new ConcurrentHashMap<>();
