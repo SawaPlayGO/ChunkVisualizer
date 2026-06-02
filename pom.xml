@@ -112,7 +112,8 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                                      tofile="C:/work/servers/plugins/${project.artifactId}.jar"/>
+                                      tofile="C:/work/servers/plugins/${project.artifactId}.jar"
+                                      failonerror="false"/>
                             </target>
                         </configuration>
                     </execution>
