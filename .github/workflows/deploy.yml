@@ -1,0 +1,47 @@
+name: CD
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - name: Checkout github repo
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 24
+          distribution: temurin
+          cache: maven
+
+      - name: Set version from release tag
+        run: mvn -B versions:set -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+
+      - name: Build and package with Maven
+        run: mvn -B clean package --file pom.xml
+
+      - name: Rename shaded jar
+        run: mv target/ChunkVisualizer-${{ github.event.release.tag_name }}-shaded.jar target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
+
+      - name: Push to modrinth
+        uses: cloudnode-pro/modrinth-publish@v2
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: ${{ vars.MODRINTH_ID }}
+          name: ${{ github.event.release.name }}
+          version: ${{ github.event.release.tag_name }}
+          changelog: ${{ github.event.release.body }}
+          loaders: |-
+            paper
+            spigot
+            bukkit
+          game-versions: |-
+            1.21.x
+          files: target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar

@@ -1,10 +1,10 @@
 package ru.sawaplago.chunkVisualizer.managers;
 
+import java.io.File;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
 
 public class ConfigManager {
     private final JavaPlugin plugin;
@@ -22,7 +22,16 @@ public class ConfigManager {
         config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public int getDefaultHeight() { return config.getInt("settings.default-height", 10); }
-    public boolean isDefaultEnabled() { return config.getBoolean("settings.default-enabled", true); }
-    public String getDefaultMaterial() { return config.getString("settings.default-material", "GLOWSTONE"); }
+    public int getDefaultHeight() {
+        return config.getInt("settings.default-height", 10);
+    }
+
+    public boolean isDefaultIsEnabled() {
+        return config.getBoolean("settings.default-enabled", true);
+    }
+
+    public Material getDefaultMaterial() {
+        String materialName = config.getString("settings.default-material", "GLOWSTONE");
+        return Material.getMaterial(materialName);
+    }
 }

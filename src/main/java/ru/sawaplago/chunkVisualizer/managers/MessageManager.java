@@ -1,12 +1,11 @@
 package ru.sawaplago.chunkVisualizer.managers;
 
+import java.io.File;
+import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.util.logging.Level;
 
 public class MessageManager {
 
@@ -46,7 +45,10 @@ public class MessageManager {
     public String getMessage(String path) {
         String message = getConfig().getString(path);
         if (message == null) {
-            plugin.getLogger().log(Level.WARNING, "Сообщение по пути '" + path + "' не найдено в messages.yml");
+            plugin.getLogger()
+                    .log(
+                            Level.WARNING,
+                            "Сообщение по пути '" + path + "' не найдено в messages.yml");
             return ChatColor.RED + "Missing message: " + path;
         }
         return ChatColor.translateAlternateColorCodes('&', message);

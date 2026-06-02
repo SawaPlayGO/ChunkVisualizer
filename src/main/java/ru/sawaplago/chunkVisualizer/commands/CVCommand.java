@@ -1,19 +1,18 @@
 package ru.sawaplago.chunkVisualizer.commands;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 import ru.sawaplago.chunkVisualizer.ChunkVisualizer;
-import ru.sawaplago.chunkVisualizer.managers.MessageManager;
 import ru.sawaplago.chunkVisualizer.commands.sub.ReloadSubCommand;
 import ru.sawaplago.chunkVisualizer.commands.sub.SettingsSubCommand;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import ru.sawaplago.chunkVisualizer.managers.MessageManager;
 
 public class CVCommand implements CommandExecutor, TabCompleter {
 
@@ -27,7 +26,11 @@ public class CVCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(
+            @NotNull CommandSender sender,
+            @NotNull Command command,
+            @NotNull String label,
+            @NotNull String[] args) {
         if (args.length == 0) {
             sender.sendMessage(mm.getMessage("commands.help-header"));
             sender.sendMessage(mm.getMessage("commands.help-settings"));
@@ -47,15 +50,22 @@ public class CVCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public List<String> onTabComplete(
+            @NotNull CommandSender sender,
+            @NotNull Command command,
+            @NotNull String alias,
+            @NotNull String[] args) {
         if (args.length == 1) {
             return subCommands.keySet().stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))
-                    .filter(s -> {
-                        if (s.equals("reload")) return sender.hasPermission("chunkvisualizer.admin");
-                        if (s.equals("settings")) return sender.hasPermission("chunkvisualizer.settings");
-                        return true;
-                    })
+                    .filter(
+                            s -> {
+                                if (s.equals("reload"))
+                                    return sender.hasPermission("chunkvisualizer.admin");
+                                if (s.equals("settings"))
+                                    return sender.hasPermission("chunkvisualizer.settings");
+                                return true;
+                            })
                     .collect(Collectors.toList());
         }
 
