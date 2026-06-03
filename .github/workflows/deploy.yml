@@ -29,6 +29,9 @@ jobs:
       - name: Build and package with Maven
         run: mvn -B -X -e clean package --file pom.xml
 
+      - name: List target directory
+        run: find target -type f
+
       - name: Rename shaded jar
         run: mv target/ChunkVisualizer-${{ github.event.release.tag_name }}-shaded.jar target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
 
