@@ -44,3 +44,8 @@ jobs:
           game-versions: |-
             1.21.x
           files: target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
+
+      - name: Upload jar to release
+        run: gh release upload ${{ github.event.release.tag_name }} target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
