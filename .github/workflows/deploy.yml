@@ -8,6 +8,7 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+    permissions: write-all
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
@@ -29,6 +30,11 @@ jobs:
       - name: Build and package with Maven
         run: mvn -B -X -e clean package --file pom.xml
 
+      - name: Upload jar to release
+        run: gh release upload ${{ github.event.release.tag_name }} target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Push to modrinth
         uses: cloudnode-pro/modrinth-publish@v2
         with:
@@ -44,8 +50,3 @@ jobs:
           game-versions: |-
             1.21.x
           files: target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
-
-      - name: Upload jar to release
-        run: gh release upload ${{ github.event.release.tag_name }} target/ChunkVisualizer-${{ github.event.release.tag_name }}.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
