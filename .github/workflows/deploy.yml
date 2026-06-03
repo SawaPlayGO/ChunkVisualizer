@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout github repo
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up JDK
         uses: actions/setup-java@v5
