@@ -36,8 +36,9 @@ public class SettingsMenu implements Listener {
     private static final int MODE_SLOT = 18;
 
     // Режим BLOCKS
-    private static final int HEIGHT_SLOT = 12; // высота + toggle
-    private static final int BLOCK_SLOT = 14; // материал
+    private static final int HEIGHT_SLOT = 11; // высота + toggle
+    private static final int BLOCK_SLOT = 13; // материал
+    private static final int BLOCK_GLOW_COLOR_SLOT = 15; // цвет обводки
 
     // Режим WALLS (четыре кнопки через одну)
     private static final int WALLS_STATUS_SLOT = 10; // toggle
@@ -57,7 +58,6 @@ public class SettingsMenu implements Listener {
         this.messageManager = ChunkVisualizer.getInstance().getMessageManager();
     }
 
-    /** Холдер нужен, чтобы listener отличал это меню от остальных инвентарей. */
     private static class MenuHolder implements InventoryHolder {
         private Inventory inventory;
 
@@ -180,6 +180,18 @@ public class SettingsMenu implements Listener {
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
                 return true;
             }
+            case BLOCK_GLOW_COLOR_SLOT -> {
+                WallColor color = current.resolveBlockGlowColor();
+                if (click.isLeftClick()) {
+                    current.setBlockGlowColor(color.next());
+                } else if (click.isRightClick()) {
+                    current.setBlockGlowColor(color.previous());
+                } else {
+                    return false;
+                }
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+                return true;
+            }
             default -> {
                 return false;
             }
@@ -234,6 +246,7 @@ public class SettingsMenu implements Listener {
             }
         }
     }
+
     private void handleBottomClick(InventoryClickEvent event, Player player, Inventory inventory) {
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || !clicked.getType().isBlock() || clicked.getType().isAir()) {
@@ -331,6 +344,23 @@ public class SettingsMenu implements Listener {
                     BLOCK_SLOT,
                     createItem(
                             currentMaterial, messageManager.getMessage("gui.block-name"), lore));
+
+            // --- Цвет обводки блоков ---
+            WallColor glowColor = settings.resolveBlockGlowColor();
+            String glowColorText = messageManager.getMessage("gui.colors." + glowColor.name());
+            inventory.setItem(
+                    BLOCK_GLOW_COLOR_SLOT,
+                    createItem(
+                            glowColor.getIcon(),
+                            messageManager
+                                    .getMessage("gui.block-glow-name")
+                                    .replace("%color%", glowColorText),
+                            List.of(
+                                    messageManager.getMessage("gui.lore-color-current")
+                                            + glowColorText,
+                                    "",
+                                    messageManager.getMessage("gui.lore-color-next"),
+                                    messageManager.getMessage("gui.lore-color-prev"))));
         } else {
             // --- Toggle ---
             inventory.setItem(

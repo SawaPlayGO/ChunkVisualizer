@@ -38,6 +38,11 @@ public class ConfigManager {
         return material != null ? material : Material.GLOWSTONE;
     }
 
+    public WallColor getDefaultBlockGlowColor() {
+        return WallColor.fromString(
+                config.getString("settings.default-block-glow-color", "WHITE"), WallColor.WHITE);
+    }
+
     public HighlightMode getDefaultMode() {
         return HighlightMode.fromString(
                 config.getString("settings.default-mode", "BLOCKS"), HighlightMode.BLOCKS);

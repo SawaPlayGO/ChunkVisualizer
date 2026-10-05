@@ -18,6 +18,7 @@ public class UserSettings {
     private int heights;
     private boolean isEnabled;
     private Material material;
+    private WallColor blockGlowColor;
     private HighlightMode mode;
     private WallColor wallColor;
     private int wallAlpha;
@@ -30,6 +31,7 @@ public class UserSettings {
                 configManager.getDefaultHeight(),
                 configManager.isDefaultIsEnabled(),
                 configManager.getDefaultMaterial(),
+                configManager.getDefaultBlockGlowColor(),
                 configManager.getDefaultMode(),
                 configManager.getDefaultWallColor(),
                 configManager.getDefaultWallAlpha(),
@@ -40,5 +42,10 @@ public class UserSettings {
     public HighlightMode getEffectiveMode(Player player) {
         HighlightMode current = mode == null ? HighlightMode.BLOCKS : mode;
         return current.canUse(player) ? current : HighlightMode.BLOCKS;
+    }
+
+    /** Цвет обводки блоков; если в БД null - белый (стандартный). */
+    public WallColor resolveBlockGlowColor() {
+        return blockGlowColor != null ? blockGlowColor : WallColor.WHITE;
     }
 }

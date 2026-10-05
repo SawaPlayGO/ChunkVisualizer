@@ -12,6 +12,10 @@ settings:
   # See: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
   default-material: "GLOWSTONE"
 
+  # Default outline (glow) color of the corner blocks (BLOCKS mode):
+  # RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE, WHITE
+  default-block-glow-color: "WHITE"
+
   # Default highlight mode for new players:
   #   BLOCKS - corner blocks (item_display)
   #   WALLS  - chunk walls (text_display), requires permission chunkvisualizer.use.display

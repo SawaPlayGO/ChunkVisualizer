@@ -33,8 +33,8 @@ public class DatabaseManager {
                         handle.createUpdate(
                                         """
                                     INSERT OR REPLACE INTO user_settings
-                                    (playerName, heights, isEnabled, material, mode, wallColor, wallAlpha, wallGlow)
-                                    VALUES (:playerName, :heights, :enabled, :material, :mode, :wallColor, :wallAlpha, :wallGlow)
+                                    (playerName, heights, isEnabled, material, blockGlowColor, mode, wallColor, wallAlpha, wallGlow)
+                                    VALUES (:playerName, :heights, :enabled, :material, :blockGlowColor, :mode, :wallColor, :wallAlpha, :wallGlow)
                                 """)
                                 .bindBean(settings)
                                 .execute());
@@ -46,7 +46,7 @@ public class DatabaseManager {
                         handle.createQuery(
                                         """
                                    SELECT playerName, heights, isEnabled as enabled, material,
-                                          mode, wallColor, wallAlpha, wallGlow
+                                          blockGlowColor, mode, wallColor, wallAlpha, wallGlow
                                    FROM user_settings
                                    WHERE playerName = :playerName
                                 """)
@@ -82,14 +82,15 @@ public class DatabaseManager {
                         handle.execute(
                                 """
                             CREATE TABLE IF NOT EXISTS user_settings (
-                                playerName  TEXT PRIMARY KEY,
-                                heights     INTEGER,
-                                isEnabled   BOOLEAN,
-                                material    TEXT,
-                                mode        TEXT DEFAULT 'BLOCKS',
-                                wallColor   TEXT DEFAULT 'RED',
-                                wallAlpha   INTEGER DEFAULT 50,
-                                wallGlow    BOOLEAN DEFAULT 0
+                                playerName      TEXT PRIMARY KEY,
+                                heights         INTEGER,
+                                isEnabled       BOOLEAN,
+                                material        TEXT,
+                                blockGlowColor  TEXT DEFAULT 'WHITE',
+                                mode            TEXT DEFAULT 'BLOCKS',
+                                wallColor       TEXT DEFAULT 'RED',
+                                wallAlpha       INTEGER DEFAULT 50,
+                                wallGlow        BOOLEAN DEFAULT 0
                             )
                         """));
     }
@@ -119,6 +120,10 @@ public class DatabaseManager {
                     if (!columns.contains("wallGlow")) {
                         handle.execute(
                                 "ALTER TABLE user_settings ADD COLUMN wallGlow BOOLEAN DEFAULT 0");
+                    }
+                    if (!columns.contains("blockGlowColor")) {
+                        handle.execute(
+                                "ALTER TABLE user_settings ADD COLUMN blockGlowColor TEXT DEFAULT 'WHITE'");
                     }
                 });
     }

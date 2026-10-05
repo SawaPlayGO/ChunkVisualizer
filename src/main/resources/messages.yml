@@ -32,6 +32,9 @@ gui:
     - ""
     - "&cRMB: &fReset to Glowstone"
 
+  # Blocks mode: outline color
+  block-glow-name: "&eOutline Color: &f%color%"
+
   # Highlight mode
   mode-name: "&eHighlight Mode: &b%mode%"
   mode-blocks: "Corner blocks"

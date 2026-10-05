@@ -42,7 +42,6 @@ public enum WallColor {
         return values[(ordinal() - 1 + values.length) % values.length];
     }
 
-    /** Возвращает ARGB-значение для background text_display. */
     public int toArgb(int alphaPercent) {
         int clamped = Math.max(0, Math.min(100, alphaPercent));
         int alpha = Math.round(clamped * 255f / 100f);
