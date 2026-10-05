@@ -29,7 +29,7 @@ Use the `/cv settings` command to open an intuitive interface that allows you to
 
 All settings are saved per player and restored on the next join.
 
-<video src="https://github.com/user-attachments/assets/61dedf24-954d-4cf6-b2c6-2c204fe4b0c6" autoplay loop muted playsinline width="100%"></video>
+<video src="https://github.com/user-attachments/assets/847536c4-6fbf-4497-92b0-ea9d664e972a" autoplay loop muted playsinline width="100%"></video>
 <video src="https://github.com/user-attachments/assets/8879c05a-d4b9-49ea-a828-76fc4d1768e4" autoplay loop muted playsinline width="100%"></video>
 
 ### 3. Non-Intrusive "Ghost" Blocks
