@@ -342,8 +342,7 @@ public class SettingsMenu implements Listener {
                             .toList();
             inventory.setItem(
                     BLOCK_SLOT,
-                    createItem(
-                            currentMaterial, messageManager.getMessage("gui.block-name"), lore));
+                    createItem(currentMaterial, messageManager.getMessage("gui.block-name"), lore));
 
             // --- Цвет обводки блоков ---
             WallColor glowColor = settings.resolveBlockGlowColor();
@@ -387,8 +386,7 @@ public class SettingsMenu implements Listener {
                                     .getMessage("gui.color-name")
                                     .replace("%color%", colorText),
                             List.of(
-                                    messageManager.getMessage("gui.lore-color-current")
-                                            + colorText,
+                                    messageManager.getMessage("gui.lore-color-current") + colorText,
                                     "",
                                     messageManager.getMessage("gui.lore-color-next"),
                                     messageManager.getMessage("gui.lore-color-prev"))));
@@ -415,7 +413,9 @@ public class SettingsMenu implements Listener {
                     WALLS_GLOW_SLOT,
                     createItem(
                             glowOn ? Material.GLOW_INK_SAC : Material.INK_SAC,
-                            messageManager.getMessage("gui.glow-name").replace("%status%", glowText),
+                            messageManager
+                                    .getMessage("gui.glow-name")
+                                    .replace("%status%", glowText),
                             List.of(
                                     messageManager.getMessage("gui.lore-status") + glowText,
                                     "",

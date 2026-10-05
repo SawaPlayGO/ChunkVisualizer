@@ -59,10 +59,7 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
                             new Vector3f(7.5f, 0f, 0f),
                             new Quaternion4f(0f, -0.7071f, 0f, 0.7071f)),
                     new Wall(
-                            9.5,
-                            9.5,
-                            new Vector3f(0f, 0f, 6.5f),
-                            new Quaternion4f(0f, 1f, 0f, 0f)),
+                            9.5, 9.5, new Vector3f(0f, 0f, 6.5f), new Quaternion4f(0f, 1f, 0f, 0f)),
                     new Wall(
                             6.5,
                             9.5,
@@ -135,8 +132,7 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
         meta.add(
                 new EntityData<>(
                         META_LEFT_ROTATION, EntityDataTypes.QUATERNION, wall.leftRotation()));
-        meta.add(
-                new EntityData<>(META_RIGHT_ROTATION, EntityDataTypes.QUATERNION, RIGHT_ROTATION));
+        meta.add(new EntityData<>(META_RIGHT_ROTATION, EntityDataTypes.QUATERNION, RIGHT_ROTATION));
         meta.add(new EntityData<>(META_BILLBOARD, EntityDataTypes.BYTE, BILLBOARD_FIXED));
         meta.add(new EntityData<>(META_VIEW_RANGE, EntityDataTypes.FLOAT, VIEW_RANGE));
         // width/height не отправляем: 0 = без culling по боксу

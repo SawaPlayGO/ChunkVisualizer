@@ -71,7 +71,7 @@ public class DatabaseManager {
                         (type, value, __) ->
                                 type == Material.class && value instanceof Material m
                                         ? Optional.of(
-                                        (pos, stmt, ___) -> stmt.setString(pos, m.name()))
+                                                (pos, stmt, ___) -> stmt.setString(pos, m.name()))
                                         : Optional.empty());
         // HighlightMode и WallColor (enum) Jdbi сохраняет/читает по имени сам
     }
