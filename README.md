@@ -35,17 +35,17 @@ Built using modern packets and **Display Entities**, these blocks have no collis
 | :--- | :--- | :--- |
 | `/cv` | Main command (Help menu) | `chunkvisualizer.use` |
 | `/cv settings` | Open the customization GUI | `chunkvisualizer.use` |
+| `/cv settings` | Display type hightlight | `chunkvisualizer.use.display` |
 | `/cv reload` | Reload configuration files | `chunkvisualizer.admin` |
 
 ---
 
 ## ⚙️ Installation
-1. Download the latest `.jar` file from the [Releases](https://github.com/SawaPlayGO/ChunkVisualizer/releases/tag/v0.1) page.
+1. Download the latest `.jar` file from the [Releases](https://github.com/SawaPlayGO/ChunkVisualizer/releases) page.
 2. Place it into your server's `plugins` folder.
 3. Restart the server or load it using a plugin manager.
 
 ---
 
 ## 📝 Roadmap
-* [ ] Persistent user settings storage (Database/Flatfile support).
 * [ ] Color support for boundary block outlines/highlights.

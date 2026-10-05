@@ -2,7 +2,7 @@
 
 # A full server restart is required to apply changes
 settings:
-  # Default height for the visualization relative to the player
+  # Default height for the visualization relative to the player (BLOCKS mode)
   default-height: 1
 
   # Should the visualization be enabled by default when a player joins for the first time?
@@ -11,3 +11,14 @@ settings:
   # Default block material for the display (Must be a valid Bukkit Material name)
   # See: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
   default-material: "GLOWSTONE"
+
+  # Default highlight mode for new players:
+  #   BLOCKS - corner blocks (item_display)
+  #   WALLS  - chunk walls (text_display), requires permission chunkvisualizer.use.display
+  default-mode: "BLOCKS"
+
+  # Default wall color (WALLS mode): RED, ORANGE, YELLOW, GREEN, CYAN, BLUE, PURPLE, WHITE
+  default-wall-color: "RED"
+
+  # Default wall opacity in percent (5-100, 100 = fully opaque)
+  default-wall-alpha: 50

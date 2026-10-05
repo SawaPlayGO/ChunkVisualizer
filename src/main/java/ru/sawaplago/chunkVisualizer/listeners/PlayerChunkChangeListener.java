@@ -15,12 +15,14 @@ import ru.sawaplago.chunkVisualizer.managers.DatabaseManager;
 import ru.sawaplago.chunkVisualizer.managers.UserSettingsManager;
 import ru.sawaplago.chunkVisualizer.managers.data.UserSettings;
 import ru.sawaplago.chunkVisualizer.objects.Chunk;
+import ru.sawaplago.chunkVisualizer.visuals.ChunkHighlighter;
 import ru.sawaplago.chunkVisualizer.visuals.ItemDisplayChunkHighlighter;
+import ru.sawaplago.chunkVisualizer.visuals.TextDisplayWallHighlighter;
 
 public class PlayerChunkChangeListener implements Listener {
     private final DatabaseManager databaseManager;
     private final UserSettingsManager userSettingsManager;
-    private final Map<UUID, ItemDisplayChunkHighlighter> activeHighlighters = new HashMap<>();
+    private final Map<UUID, ChunkHighlighter> activeHighlighters = new HashMap<>();
 
     public PlayerChunkChangeListener() {
         this.databaseManager = ChunkVisualizer.getInstance().getDatabaseManager();
@@ -30,34 +32,13 @@ public class PlayerChunkChangeListener implements Listener {
     @EventHandler
     public void onPlayerChunkChange(PlayerChunkChangeEvent event) {
         Player p = event.getPlayer();
-        Chunk chunkTo = event.getToChunk();
-
-        ItemDisplayChunkHighlighter oldHighlighter = activeHighlighters.remove(p.getUniqueId());
-        if (oldHighlighter != null) {
-            oldHighlighter.despawn();
-        }
-
-        UserSettings userSettings = userSettingsManager.getSettings(p.getUniqueId());
-
-        if (userSettings == null || !userSettings.isEnabled()) {
-            return;
-        }
-
-        if (!userSettings.isEnabled()) {
-            return;
-        }
-
-        ItemDisplayChunkHighlighter newHighlighter =
-                new ItemDisplayChunkHighlighter(
-                        chunkTo, p, userSettings.getHeights(), userSettings.getMaterial());
-        newHighlighter.show();
-        activeHighlighters.put(p.getUniqueId(), newHighlighter);
+        removeHighlighter(p);
+        showHighlighter(p, event.getToChunk());
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Chunk currentChunk = Chunk.getCurrentChunk(player);
 
         Optional<UserSettings> userSettingsOpt = databaseManager.getUserSettings(player.getName());
 
@@ -65,33 +46,47 @@ public class PlayerChunkChangeListener implements Listener {
         if (userSettingsOpt.isEmpty()) {
             userSettings = UserSettings.defaultSettings(player.getName());
             databaseManager.saveOrCreateUserSettings(userSettings);
-            userSettingsManager.setSettings(player.getUniqueId(), userSettings);
         } else {
             userSettings = userSettingsOpt.get();
-            userSettingsManager.setSettings(player.getUniqueId(), userSettings);
         }
+        userSettingsManager.setSettings(player.getUniqueId(), userSettings);
 
-        if (!userSettings.isEnabled()) {
-            return;
-        }
-
-        ItemDisplayChunkHighlighter newHighlighter =
-                new ItemDisplayChunkHighlighter(
-                        currentChunk,
-                        player,
-                        userSettings.getHeights(),
-                        userSettings.getMaterial());
-        newHighlighter.show();
-        activeHighlighters.put(player.getUniqueId(), newHighlighter);
+        showHighlighter(player, Chunk.getCurrentChunk(player));
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        ItemDisplayChunkHighlighter highlighter =
-                activeHighlighters.remove(event.getPlayer().getUniqueId());
+        removeHighlighter(event.getPlayer());
         userSettingsManager.removeSettings(event.getPlayer().getUniqueId());
-        if (highlighter != null) {
-            highlighter.despawn();
+    }
+
+    private void removeHighlighter(Player player) {
+        ChunkHighlighter old = activeHighlighters.remove(player.getUniqueId());
+        if (old != null) {
+            old.despawn();
         }
+    }
+
+    private void showHighlighter(Player player, Chunk chunk) {
+        UserSettings settings = userSettingsManager.getSettings(player.getUniqueId());
+        if (settings == null || !settings.isEnabled()) {
+            return;
+        }
+
+        ChunkHighlighter highlighter =
+                switch (settings.getEffectiveMode(player)) {
+                    case WALLS ->
+                            new TextDisplayWallHighlighter(
+                                    chunk,
+                                    player,
+                                    settings.getWallColor(),
+                                    settings.getWallAlpha());
+                    case BLOCKS ->
+                            new ItemDisplayChunkHighlighter(
+                                    chunk, player, settings.getHeights(), settings.getMaterial());
+                };
+
+        highlighter.show();
+        activeHighlighters.put(player.getUniqueId(), highlighter);
     }
 }

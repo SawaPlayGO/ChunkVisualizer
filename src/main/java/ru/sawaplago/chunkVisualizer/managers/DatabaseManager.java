@@ -3,7 +3,9 @@ package ru.sawaplago.chunkVisualizer.managers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.File;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import org.bukkit.Material;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.argument.ArgumentFactory;
@@ -21,6 +23,7 @@ public class DatabaseManager {
         this.dataSource = new HikariDataSource(config);
         this.jdbi = Jdbi.create(dataSource);
         this.createTables();
+        this.migrateTables();
         this.registerMappers();
     }
 
@@ -30,8 +33,8 @@ public class DatabaseManager {
                         handle.createUpdate(
                                         """
                                     INSERT OR REPLACE INTO user_settings
-                                    (playerName, heights, isEnabled, material)
-                                    VALUES (:playerName, :heights, :enabled, :material)
+                                    (playerName, heights, isEnabled, material, mode, wallColor, wallAlpha)
+                                    VALUES (:playerName, :heights, :enabled, :material, :mode, :wallColor, :wallAlpha)
                                 """)
                                 .bindBean(settings)
                                 .execute());
@@ -42,7 +45,8 @@ public class DatabaseManager {
                 handle ->
                         handle.createQuery(
                                         """
-                                   SELECT playerName, heights, isEnabled as enabled, material
+                                   SELECT playerName, heights, isEnabled as enabled, material,
+                                          mode, wallColor, wallAlpha
                                    FROM user_settings
                                    WHERE playerName = :playerName
                                 """)
@@ -67,8 +71,9 @@ public class DatabaseManager {
                         (type, value, __) ->
                                 type == Material.class && value instanceof Material m
                                         ? Optional.of(
-                                                (pos, stmt, ___) -> stmt.setString(pos, m.name()))
+                                        (pos, stmt, ___) -> stmt.setString(pos, m.name()))
                                         : Optional.empty());
+        // HighlightMode и WallColor (enum) Jdbi сохраняет/читает по имени сам
     }
 
     private void createTables() {
@@ -77,12 +82,40 @@ public class DatabaseManager {
                         handle.execute(
                                 """
                             CREATE TABLE IF NOT EXISTS user_settings (
-                                playerName TEXT PRIMARY KEY,
+                                playerName  TEXT PRIMARY KEY,
                                 heights     INTEGER,
-                                isEnabled  BOOLEAN,
-                                material    TEXT
+                                isEnabled   BOOLEAN,
+                                material    TEXT,
+                                mode        TEXT DEFAULT 'BLOCKS',
+                                wallColor   TEXT DEFAULT 'RED',
+                                wallAlpha   INTEGER DEFAULT 50
                             )
                         """));
+    }
+
+    /** Добавляет новые колонки в таблицу, созданную старыми версиями плагина. */
+    private void migrateTables() {
+        jdbi.useHandle(
+                handle -> {
+                    Set<String> columns =
+                            new HashSet<>(
+                                    handle.createQuery(
+                                                    "SELECT name FROM pragma_table_info('user_settings')")
+                                            .mapTo(String.class)
+                                            .list());
+                    if (!columns.contains("mode")) {
+                        handle.execute(
+                                "ALTER TABLE user_settings ADD COLUMN mode TEXT DEFAULT 'BLOCKS'");
+                    }
+                    if (!columns.contains("wallColor")) {
+                        handle.execute(
+                                "ALTER TABLE user_settings ADD COLUMN wallColor TEXT DEFAULT 'RED'");
+                    }
+                    if (!columns.contains("wallAlpha")) {
+                        handle.execute(
+                                "ALTER TABLE user_settings ADD COLUMN wallAlpha INTEGER DEFAULT 50");
+                    }
+                });
     }
 
     private static String getAndCreateDirectory(String fileName) {

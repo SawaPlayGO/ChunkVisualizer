@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import ru.sawaplago.chunkVisualizer.objects.Chunk;
 
-public class ItemDisplayChunkHighlighter {
+public class ItemDisplayChunkHighlighter implements ChunkHighlighter {
     private static final byte GLOWING_FLAG = 0x40;
     private static final byte INVISIBLE_FLAG = 0x20;
     private static final int METADATA_ITEM_INDEX = 23;
@@ -42,6 +42,7 @@ public class ItemDisplayChunkHighlighter {
         this.height = height;
     }
 
+    @Override
     public void show() {
         if (!activeEntityIds.isEmpty()) return;
 
@@ -92,6 +93,7 @@ public class ItemDisplayChunkHighlighter {
         return entityId;
     }
 
+    @Override
     public void despawn() {
         if (activeEntityIds.isEmpty()) return;
 
