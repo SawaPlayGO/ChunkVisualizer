@@ -1,14 +1,20 @@
 package ru.sawaplago.chunkVisualizer.menus;
 
-import com.github.stefvanschie.inventoryframework.gui.GuiItem;
-import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
-import com.github.stefvanschie.inventoryframework.pane.StaticPane;
 import java.util.List;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ru.sawaplago.chunkVisualizer.ChunkVisualizer;
@@ -20,7 +26,11 @@ import ru.sawaplago.chunkVisualizer.managers.UserSettingsManager;
 import ru.sawaplago.chunkVisualizer.managers.data.UserSettings;
 import ru.sawaplago.chunkVisualizer.objects.Chunk;
 
-public class SettingsMenu {
+public class SettingsMenu implements Listener {
+
+    private static final int SIZE = 27;
+    private static final int HEIGHT_SLOT = 12; // x=3, y=1
+    private static final int BLOCK_SLOT = 14; // x=5, y=1
 
     private final MessageManager messageManager;
     private final UserSettingsManager userSettingsManager;
@@ -34,12 +44,124 @@ public class SettingsMenu {
         this.messageManager = ChunkVisualizer.getInstance().getMessageManager();
     }
 
+    /** Холдер нужен, чтобы listener отличал это меню от остальных инвентарей. */
+    private static class MenuHolder implements InventoryHolder {
+        private Inventory inventory;
+
+        void setInventory(Inventory inventory) {
+            this.inventory = inventory;
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return inventory;
+        }
+    }
+
     public void open(Player player) {
-        ChestGui gui = new ChestGui(3, messageManager.getMessage("menu-title"));
+        MenuHolder holder = new MenuHolder();
+        Inventory inventory =
+                Bukkit.createInventory(
+                        holder,
+                        SIZE,
+                        LegacyComponentSerializer.legacySection()
+                                .deserialize(messageManager.getMessage("menu-title")));
+        holder.setInventory(inventory);
 
-        gui.setOnTopClick(event -> event.setCancelled(true));
+        render(player, inventory);
+        player.openInventory(inventory);
+    }
 
-        StaticPane pane = new StaticPane(0, 0, 9, 3);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onClick(InventoryClickEvent event) {
+        if (!(event.getView().getTopInventory().getHolder() instanceof MenuHolder holder)) {
+            return;
+        }
+
+        // Пока открыто это меню, отменяем любые клики
+        event.setCancelled(true);
+
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        Inventory clickedInventory = event.getClickedInventory();
+        if (clickedInventory == null) return;
+
+        try {
+            if (clickedInventory == holder.getInventory()) {
+                handleTopClick(event, player, holder.getInventory());
+            } else {
+                handleBottomClick(event, player, holder.getInventory());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDrag(InventoryDragEvent event) {
+        if (event.getView().getTopInventory().getHolder() instanceof MenuHolder) {
+            event.setCancelled(true);
+        }
+    }
+
+    private void handleTopClick(InventoryClickEvent event, Player player, Inventory inventory) {
+        int slot = event.getSlot();
+        ClickType click = event.getClick();
+
+        if (slot == HEIGHT_SLOT) {
+            UserSettings current = userSettingsManager.getSettings(player.getUniqueId());
+            if (current == null) return;
+
+            if (click.isShiftClick()) {
+                current.setEnabled(!current.isEnabled());
+                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
+            } else if (click.isLeftClick()) {
+                current.setHeights(current.getHeights() - 1);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+            } else if (click.isRightClick()) {
+                current.setHeights(current.getHeights() + 1);
+                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+            } else {
+                return;
+            }
+
+            saveAndRefresh(player, current, inventory);
+        } else if (slot == BLOCK_SLOT && click.isRightClick() && !click.isShiftClick()) {
+            UserSettings current = userSettingsManager.getSettings(player.getUniqueId());
+            if (current == null) return;
+
+            current.setMaterial(configManager.getDefaultMaterial());
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
+
+            saveAndRefresh(player, current, inventory);
+        }
+    }
+
+    private void handleBottomClick(InventoryClickEvent event, Player player, Inventory inventory) {
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || !clicked.getType().isBlock() || clicked.getType().isAir()) {
+            return;
+        }
+
+        UserSettings current = userSettingsManager.getSettings(player.getUniqueId());
+        if (current == null) return;
+
+        current.setMaterial(clicked.getType());
+        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
+
+        saveAndRefresh(player, current, inventory);
+    }
+
+    private void saveAndRefresh(Player player, UserSettings settings, Inventory inventory) {
+        databaseManager.saveOrCreateUserSettings(settings);
+        userSettingsManager.setSettings(player.getUniqueId(), settings);
+
+        refreshVisuals(player);
+        render(player, inventory);
+    }
+
+    private void render(Player player, Inventory inventory) {
+        UserSettings userSettings = userSettingsManager.getSettings(player.getUniqueId());
+        if (userSettings == null) return;
 
         ItemStack glass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta glassMeta = glass.getItemMeta();
@@ -47,39 +169,9 @@ public class SettingsMenu {
             glassMeta.setDisplayName(" ");
             glass.setItemMeta(glassMeta);
         }
-        pane.fillWith(glass);
-
-        gui.setOnBottomClick(
-                event -> {
-                    event.setCancelled(true);
-                    ItemStack clicked = event.getCurrentItem();
-
-                    if (clicked != null
-                            && clicked.getType().isBlock()
-                            && !clicked.getType().isAir()) {
-                        UserSettings userSettings =
-                                userSettingsManager.getSettings(player.getUniqueId());
-                        if (userSettings == null) return;
-
-                        userSettings.setMaterial(clicked.getType());
-                        databaseManager.saveOrCreateUserSettings(userSettings);
-                        userSettingsManager.setSettings(player.getUniqueId(), userSettings);
-                        player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
-
-                        refreshVisuals(player);
-                        updateMenu(player, pane, gui);
-                        gui.update();
-                    }
-                });
-
-        updateMenu(player, pane, gui);
-        gui.addPane(pane);
-        gui.show(player);
-    }
-
-    private void updateMenu(Player player, StaticPane pane, ChestGui gui) {
-        UserSettings userSettings = userSettingsManager.getSettings(player.getUniqueId());
-        if (userSettings == null) return;
+        for (int i = 0; i < SIZE; i++) {
+            inventory.setItem(i, glass);
+        }
 
         int currentHeight = userSettings.getHeights();
         boolean isEnabled = userSettings.isEnabled();
@@ -93,6 +185,7 @@ public class SettingsMenu {
                 messageManager
                         .getMessage("gui.height-name")
                         .replace("%height%", String.valueOf(currentHeight));
+
         ItemStack heightItem =
                 new ItemStack(
                         isEnabled
@@ -110,36 +203,7 @@ public class SettingsMenu {
                             messageManager.getMessage("gui.lore-shift")));
             heightItem.setItemMeta(hMeta);
         }
-
-        pane.addItem(
-                new GuiItem(
-                        heightItem,
-                        event -> {
-                            UserSettings current =
-                                    userSettingsManager.getSettings(player.getUniqueId());
-                            if (current == null) return;
-
-                            if (event.isShiftClick()) {
-                                current.setEnabled(!current.isEnabled());
-                                player.playSound(
-                                        player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
-                            } else if (event.isLeftClick()) {
-                                current.setHeights(current.getHeights() - 1);
-                                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
-                            } else if (event.isRightClick()) {
-                                current.setHeights(current.getHeights() + 1);
-                                player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
-                            }
-
-                            databaseManager.saveOrCreateUserSettings(current);
-                            userSettingsManager.setSettings(player.getUniqueId(), current);
-
-                            refreshVisuals(player);
-                            updateMenu(player, pane, gui);
-                            gui.update();
-                        }),
-                3,
-                1);
+        inventory.setItem(HEIGHT_SLOT, heightItem);
 
         ItemStack blockItem = new ItemStack(currentMaterial);
         ItemMeta bMeta = blockItem.getItemMeta();
@@ -157,29 +221,7 @@ public class SettingsMenu {
             bMeta.setLore(lore);
             blockItem.setItemMeta(bMeta);
         }
-
-        pane.addItem(
-                new GuiItem(
-                        blockItem,
-                        event -> {
-                            if (event.isRightClick()) {
-                                UserSettings current =
-                                        userSettingsManager.getSettings(player.getUniqueId());
-                                if (current == null) return;
-
-                                current.setMaterial(configManager.getDefaultMaterial());
-                                databaseManager.saveOrCreateUserSettings(current);
-                                userSettingsManager.setSettings(player.getUniqueId(), current);
-                                player.playSound(
-                                        player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
-
-                                refreshVisuals(player);
-                                updateMenu(player, pane, gui);
-                                gui.update();
-                            }
-                        }),
-                5,
-                1);
+        inventory.setItem(BLOCK_SLOT, blockItem);
     }
 
     private void refreshVisuals(Player player) {

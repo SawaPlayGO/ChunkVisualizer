@@ -11,6 +11,7 @@ import ru.sawaplago.chunkVisualizer.managers.ConfigManager;
 import ru.sawaplago.chunkVisualizer.managers.DatabaseManager;
 import ru.sawaplago.chunkVisualizer.managers.MessageManager;
 import ru.sawaplago.chunkVisualizer.managers.UserSettingsManager;
+import ru.sawaplago.chunkVisualizer.menus.SettingsMenu;
 
 @Getter
 public final class ChunkVisualizer extends JavaPlugin {
@@ -41,6 +42,7 @@ public final class ChunkVisualizer extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new ChunkChangeListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerChunkChangeListener(), this);
+        getServer().getPluginManager().registerEvents(new SettingsMenu(), this);
 
         PacketEvents.getAPI().init();
         getLogger().info("ChunkVisualizer enabled!");
@@ -48,7 +50,9 @@ public final class ChunkVisualizer extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        PacketEvents.getAPI().terminate();
+        if (PacketEvents.getAPI() != null) {
+            PacketEvents.getAPI().terminate();
+        }
         getLogger().info("ChunkVisualizer disabled!");
     }
 }
