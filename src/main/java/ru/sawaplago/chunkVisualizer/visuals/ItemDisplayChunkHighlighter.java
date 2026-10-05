@@ -19,10 +19,12 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import ru.sawaplago.chunkVisualizer.objects.Chunk;
+import ru.sawaplago.chunkVisualizer.objects.WallColor;
 
-public class ItemDisplayChunkHighlighter {
+public class ItemDisplayChunkHighlighter implements ChunkHighlighter {
     private static final byte GLOWING_FLAG = 0x40;
     private static final byte INVISIBLE_FLAG = 0x20;
+    private static final int METADATA_GLOW_COLOR_INDEX = 22;
     private static final int METADATA_ITEM_INDEX = 23;
     private static final int METADATA_DISPLAY_TYPE_INDEX = 24;
     private static final byte DISPLAY_TYPE_HEAD = 5;
@@ -34,14 +36,18 @@ public class ItemDisplayChunkHighlighter {
     private final List<Integer> activeEntityIds = new ArrayList<>();
     private final int height;
     private final Material material;
+    private final int glowRgb;
 
-    public ItemDisplayChunkHighlighter(Chunk chunk, Player player, int height, Material material) {
+    public ItemDisplayChunkHighlighter(
+            Chunk chunk, Player player, int height, Material material, WallColor glowColor) {
         this.material = material;
         this.chunk = chunk;
         this.player = player;
         this.height = height;
+        this.glowRgb = (glowColor != null ? glowColor : WallColor.WHITE).getRgb();
     }
 
+    @Override
     public void show() {
         if (!activeEntityIds.isEmpty()) return;
 
@@ -72,6 +78,9 @@ public class ItemDisplayChunkHighlighter {
         metaList.add(
                 new EntityData<>(0, EntityDataTypes.BYTE, (byte) (GLOWING_FLAG | INVISIBLE_FLAG)));
 
+        // Цвет обводки (glow color override)
+        metaList.add(new EntityData<>(METADATA_GLOW_COLOR_INDEX, EntityDataTypes.INT, glowRgb));
+
         String materialName = this.material.getKey().toString();
         ItemType type = ItemTypes.getByName(materialName);
 
@@ -92,6 +101,7 @@ public class ItemDisplayChunkHighlighter {
         return entityId;
     }
 
+    @Override
     public void despawn() {
         if (activeEntityIds.isEmpty()) return;
 

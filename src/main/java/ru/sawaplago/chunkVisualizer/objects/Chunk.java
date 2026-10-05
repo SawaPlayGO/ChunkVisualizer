@@ -1,6 +1,7 @@
 package ru.sawaplago.chunkVisualizer.objects;
 
 import java.util.ArrayList;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -38,38 +39,17 @@ public class Chunk {
     }
 
     public static Chunk getCurrentChunk(Player p) {
-        int chunkXIndex = Math.floorDiv((int) Math.floor(p.getX()), CHUNK_SIZE);
-        int chunkZIndex = Math.floorDiv((int) Math.floor(p.getZ()), CHUNK_SIZE);
+        return getCurrentChunk(p.getLocation());
+    }
 
-        int startX = chunkXIndex * CHUNK_SIZE;
-        int startZ = chunkZIndex * CHUNK_SIZE;
+    public static Chunk getCurrentChunk(Location location) {
+        int chunkXIndex = Math.floorDiv(location.getBlockX(), CHUNK_SIZE);
+        int chunkZIndex = Math.floorDiv(location.getBlockZ(), CHUNK_SIZE);
 
-        return new Chunk(startX, startZ);
+        return new Chunk(chunkXIndex * CHUNK_SIZE, chunkZIndex * CHUNK_SIZE);
     }
 
     public static ArrayList<Vector> getAngleChunk(Chunk chunk) {
-        ArrayList<Vector> chunks = new ArrayList<>();
-        Vector nwVector =
-                new Vector(chunk.startAngleVector.getX(), 0, chunk.startAngleVector.getZ());
-        Vector neVector =
-                new Vector(
-                        chunk.startAngleVector.getX() + CHUNK_SIZE,
-                        0,
-                        chunk.startAngleVector.getZ());
-        Vector swVector =
-                new Vector(
-                        chunk.startAngleVector.getX(),
-                        0,
-                        chunk.startAngleVector.getZ() + CHUNK_SIZE);
-        Vector seVector =
-                new Vector(
-                        chunk.startAngleVector.getX() + CHUNK_SIZE,
-                        0,
-                        chunk.startAngleVector.getZ() + CHUNK_SIZE);
-        chunks.add(nwVector);
-        chunks.add(neVector);
-        chunks.add(swVector);
-        chunks.add(seVector);
-        return chunks;
+        return chunk.getAngleChunk();
     }
 }

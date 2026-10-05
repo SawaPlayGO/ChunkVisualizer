@@ -1,5 +1,5 @@
 name: ChunkVisualizer
-version: '0.3.1'
+version: '0.4'
 main: ru.sawaplago.chunkVisualizer.ChunkVisualizer
 api-version: '1.21'
 authors: [ SawaPlayGO ]

@@ -3,6 +3,7 @@ menu-title: "&8Visualization Settings"
 chunk-updated: "&aChunk visualization updated!"
 only-players: "&cOnly players can use this command!"
 no-permission: "&cYou do not have permission to execute this command."
+no-permission-display: "&cYou do not have permission to use the walls mode."
 
 commands:
   unknown: "&cUnknown subcommand. Use /cv help"
@@ -14,12 +15,14 @@ commands:
 # GUI Button Settings /cv
 gui:
   height-name: "&eHighlight Height: &b%height%"
+  status-name: "&eVisualization: %status%"
   status-on: "&aON"
   status-off: "&cOFF"
   lore-status: "&7Status: "
   lore-lmb: "&eLMB: &fDecrease height (-1)"
   lore-rmb: "&eRMB: &fIncrease height (+1)"
   lore-shift: "&eShift + Click: &fToggle ON/OFF"
+  lore-toggle: "&eClick: &fToggle ON/OFF"
   block-name: "&eVisualization Material"
   block-lore:
     - "&7Current block: &f%material%"
@@ -28,3 +31,33 @@ gui:
     - "&eto change the material."
     - ""
     - "&cRMB: &fReset to Glowstone"
+
+  # Blocks mode: outline color
+  block-glow-name: "&eOutline Color: &f%color%"
+
+  # Highlight mode
+  mode-name: "&eHighlight Mode: &b%mode%"
+  mode-blocks: "Corner blocks"
+  mode-walls: "Walls"
+  lore-mode-current: "&7Current: &f"
+  lore-mode-switch: "&eClick: &fSwitch mode"
+
+  # Walls mode
+  color-name: "&eWall Color: &f%color%"
+  lore-color-current: "&7Current: &f"
+  lore-color-next: "&eLMB: &fNext color"
+  lore-color-prev: "&eRMB: &fPrevious color"
+  alpha-name: "&eWall Opacity: &b%alpha%%"
+  lore-alpha-lmb: "&eLMB: &fDecrease opacity (-5%)"
+  lore-alpha-rmb: "&eRMB: &fIncrease opacity (+5%)"
+  glow-name: "&eWall Glow: %status%"
+  lore-glow-toggle: "&eClick: &fToggle glow"
+  colors:
+    RED: "&cRed"
+    ORANGE: "&6Orange"
+    YELLOW: "&eYellow"
+    GREEN: "&aGreen"
+    CYAN: "&3Cyan"
+    BLUE: "&9Blue"
+    PURPLE: "&5Purple"
+    WHITE: "&fWhite"

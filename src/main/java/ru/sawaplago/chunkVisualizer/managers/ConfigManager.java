@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import ru.sawaplago.chunkVisualizer.objects.HighlightMode;
+import ru.sawaplago.chunkVisualizer.objects.WallColor;
 
 public class ConfigManager {
     private final JavaPlugin plugin;
@@ -32,6 +34,31 @@ public class ConfigManager {
 
     public Material getDefaultMaterial() {
         String materialName = config.getString("settings.default-material", "GLOWSTONE");
-        return Material.getMaterial(materialName);
+        Material material = Material.getMaterial(materialName);
+        return material != null ? material : Material.GLOWSTONE;
+    }
+
+    public WallColor getDefaultBlockGlowColor() {
+        return WallColor.fromString(
+                config.getString("settings.default-block-glow-color", "WHITE"), WallColor.WHITE);
+    }
+
+    public HighlightMode getDefaultMode() {
+        return HighlightMode.fromString(
+                config.getString("settings.default-mode", "BLOCKS"), HighlightMode.BLOCKS);
+    }
+
+    public WallColor getDefaultWallColor() {
+        return WallColor.fromString(
+                config.getString("settings.default-wall-color", "RED"), WallColor.RED);
+    }
+
+    public int getDefaultWallAlpha() {
+        int alpha = config.getInt("settings.default-wall-alpha", 50);
+        return Math.max(WallColor.MIN_ALPHA, Math.min(WallColor.MAX_ALPHA, alpha));
+    }
+
+    public boolean isDefaultWallGlow() {
+        return config.getBoolean("settings.default-wall-glow", false);
     }
 }

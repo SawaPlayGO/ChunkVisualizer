@@ -1,6 +1,9 @@
 package ru.sawaplago.chunkVisualizer.managers;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -33,6 +36,14 @@ public class MessageManager {
             configFile = new File(plugin.getDataFolder(), "messages.yml");
         }
         config = YamlConfiguration.loadConfiguration(configFile);
+
+        // Новые ключи из jar подхватываются, даже если messages.yml на сервере старый
+        InputStream defaults = plugin.getResource("messages.yml");
+        if (defaults != null) {
+            config.setDefaults(
+                    YamlConfiguration.loadConfiguration(
+                            new InputStreamReader(defaults, StandardCharsets.UTF_8)));
+        }
     }
 
     public FileConfiguration getConfig() {
