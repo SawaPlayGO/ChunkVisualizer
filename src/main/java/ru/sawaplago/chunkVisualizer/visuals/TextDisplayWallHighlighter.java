@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import net.kyori.adventure.text.Component;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import ru.sawaplago.chunkVisualizer.objects.Chunk;
@@ -30,15 +31,11 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
     private static final int META_RIGHT_ROTATION = 14;
     private static final int META_BILLBOARD = 15;
     private static final int META_VIEW_RANGE = 17;
-    private static final int META_WIDTH = 20;
-    private static final int META_HEIGHT = 21;
     private static final int META_TEXT = 23;
     private static final int META_BACKGROUND = 25;
 
     private static final byte BILLBOARD_FIXED = 0;
-    private static final float VIEW_RANGE = 4f;
-    private static final float WIDTH = 30f;
-    private static final float HEIGHT = 319f;
+    private static final float VIEW_RANGE = 16f;
     private static final Vector3f SCALE = new Vector3f(130f, 1020f, 1f);
     private static final Quaternion4f RIGHT_ROTATION = new Quaternion4f(0f, 0f, 0f, 1f);
 
@@ -76,7 +73,8 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
     private final int backgroundColor;
     private final List<Integer> activeEntityIds = new ArrayList<>();
 
-    public TextDisplayWallHighlighter(Chunk chunk, Player player, WallColor color, int alphaPercent) {
+    public TextDisplayWallHighlighter(
+            Chunk chunk, Player player, WallColor color, int alphaPercent) {
         this.chunk = chunk;
         this.player = player;
         WallColor safeColor = color != null ? color : WallColor.RED;
@@ -87,18 +85,32 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
     public void show() {
         if (!activeEntityIds.isEmpty()) return;
 
+        World world = player.getWorld();
+        int minY = world.getMinHeight();
+        int maxY = world.getMaxHeight() - 1;
+
+        // Спавним на высоте игрока
+        int spawnY = Math.max(minY, Math.min(maxY, player.getLocation().getBlockY()));
+
+        // Стена по-прежнему начинается с minHeight: опускаем её через translation
+        float shiftY = (float) (minY - spawnY);
+
         Vector start = chunk.getStartChunkPositionVector();
-        double y = player.getWorld().getMinHeight();
 
         for (Wall wall : WALLS) {
             Location loc =
                     new Location(
-                            start.getX() + wall.offsetX(), y, start.getZ() + wall.offsetZ(), 0, 0);
-            activeEntityIds.add(spawnWall(loc, wall));
+                            start.getX() + wall.offsetX(),
+                            spawnY,
+                            start.getZ() + wall.offsetZ(),
+                            0,
+                            0);
+            Vector3f translation = new Vector3f(wall.translation().x, shiftY, wall.translation().z);
+            activeEntityIds.add(spawnWall(loc, wall, translation));
         }
     }
 
-    private int spawnWall(Location loc, Wall wall) {
+    private int spawnWall(Location loc, Wall wall, Vector3f translation) {
         int entityId = ID_HOLDER.getAndIncrement();
         UUID uuid = UUID.randomUUID();
 
@@ -108,7 +120,7 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, spawnPacket);
 
         List<EntityData<?>> meta = new ArrayList<>();
-        meta.add(new EntityData<>(META_TRANSLATION, EntityDataTypes.VECTOR3F, wall.translation()));
+        meta.add(new EntityData<>(META_TRANSLATION, EntityDataTypes.VECTOR3F, translation));
         meta.add(new EntityData<>(META_SCALE, EntityDataTypes.VECTOR3F, SCALE));
         meta.add(
                 new EntityData<>(
@@ -117,8 +129,7 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
                 new EntityData<>(META_RIGHT_ROTATION, EntityDataTypes.QUATERNION, RIGHT_ROTATION));
         meta.add(new EntityData<>(META_BILLBOARD, EntityDataTypes.BYTE, BILLBOARD_FIXED));
         meta.add(new EntityData<>(META_VIEW_RANGE, EntityDataTypes.FLOAT, VIEW_RANGE));
-        meta.add(new EntityData<>(META_WIDTH, EntityDataTypes.FLOAT, WIDTH));
-        meta.add(new EntityData<>(META_HEIGHT, EntityDataTypes.FLOAT, HEIGHT));
+        // width/height не отправляем: 0 = без culling по боксу
         meta.add(new EntityData<>(META_TEXT, EntityDataTypes.ADV_COMPONENT, Component.text(" ")));
         meta.add(new EntityData<>(META_BACKGROUND, EntityDataTypes.INT, backgroundColor));
 
