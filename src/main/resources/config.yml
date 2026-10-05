@@ -22,3 +22,6 @@ settings:
 
   # Default wall opacity in percent (5-100, 100 = fully opaque)
   default-wall-alpha: 50
+
+  # Should the walls glow by default (WALLS mode)? Players can change it in /cv settings
+  default-wall-glow: false

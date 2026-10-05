@@ -39,10 +39,11 @@ public class SettingsMenu implements Listener {
     private static final int HEIGHT_SLOT = 12; // высота + toggle
     private static final int BLOCK_SLOT = 14; // материал
 
-    // Режим WALLS (ровная тройка по центру)
-    private static final int WALLS_STATUS_SLOT = 11; // toggle
-    private static final int WALLS_COLOR_SLOT = 13; // цвет
-    private static final int WALLS_ALPHA_SLOT = 15; // прозрачность
+    // Режим WALLS (четыре кнопки через одну)
+    private static final int WALLS_STATUS_SLOT = 10; // toggle
+    private static final int WALLS_COLOR_SLOT = 12; // цвет
+    private static final int WALLS_ALPHA_SLOT = 14; // прозрачность
+    private static final int WALLS_GLOW_SLOT = 16; // свечение
 
     private final MessageManager messageManager;
     private final UserSettingsManager userSettingsManager;
@@ -123,22 +124,44 @@ public class SettingsMenu implements Listener {
         if (current == null) return;
 
         HighlightMode mode = current.getEffectiveMode(player);
+
+        boolean changed;
+        if (slot == MODE_SLOT) {
+            changed = handleModeClick(player, click, current, mode);
+        } else if (mode == HighlightMode.BLOCKS) {
+            changed = handleBlocksClick(player, slot, click, current);
+        } else {
+            changed = handleWallsClick(player, slot, click, current);
+        }
+
+        if (changed) {
+            saveAndRefresh(player, current, inventory);
+        }
+    }
+
+    private boolean handleModeClick(
+            Player player, ClickType click, UserSettings current, HighlightMode mode) {
+        if (!click.isLeftClick() && !click.isRightClick()) return false;
+
+        HighlightMode target = mode.next();
+        if (!target.canUse(player)) {
+            player.sendMessage(messageManager.getMessage("no-permission-display"));
+            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
+            return false;
+        }
+
+        current.setMode(target);
+        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1.5f);
+        return true;
+    }
+
+    private boolean handleBlocksClick(
+            Player player, int slot, ClickType click, UserSettings current) {
         boolean leftOrRight = click.isLeftClick() || click.isRightClick();
 
         switch (slot) {
-            case MODE_SLOT -> {
-                if (!leftOrRight) return;
-                HighlightMode target = mode.next();
-                if (!target.canUse(player)) {
-                    player.sendMessage(messageManager.getMessage("no-permission-display"));
-                    player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1, 1);
-                    return;
-                }
-                current.setMode(target);
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1.5f);
-            }
             case HEIGHT_SLOT -> {
-                if (mode != HighlightMode.BLOCKS || !leftOrRight) return;
+                if (!leftOrRight) return false;
                 if (click.isShiftClick()) {
                     current.setEnabled(!current.isEnabled());
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
@@ -149,20 +172,32 @@ public class SettingsMenu implements Listener {
                     current.setHeights(current.getHeights() + 1);
                     player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
                 }
+                return true;
             }
             case BLOCK_SLOT -> {
-                if (mode != HighlightMode.BLOCKS) return;
-                if (!click.isRightClick() || click.isShiftClick()) return;
+                if (!click.isRightClick() || click.isShiftClick()) return false;
                 current.setMaterial(configManager.getDefaultMaterial());
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
+                return true;
             }
+            default -> {
+                return false;
+            }
+        }
+    }
+
+    private boolean handleWallsClick(
+            Player player, int slot, ClickType click, UserSettings current) {
+        boolean leftOrRight = click.isLeftClick() || click.isRightClick();
+
+        switch (slot) {
             case WALLS_STATUS_SLOT -> {
-                if (mode != HighlightMode.WALLS || !leftOrRight) return;
+                if (!leftOrRight) return false;
                 current.setEnabled(!current.isEnabled());
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
+                return true;
             }
             case WALLS_COLOR_SLOT -> {
-                if (mode != HighlightMode.WALLS) return;
                 WallColor color =
                         current.getWallColor() != null ? current.getWallColor() : WallColor.RED;
                 if (click.isLeftClick()) {
@@ -170,31 +205,35 @@ public class SettingsMenu implements Listener {
                 } else if (click.isRightClick()) {
                     current.setWallColor(color.previous());
                 } else {
-                    return;
+                    return false;
                 }
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+                return true;
             }
             case WALLS_ALPHA_SLOT -> {
-                if (mode != HighlightMode.WALLS) return;
                 int alpha = current.getWallAlpha();
                 if (click.isLeftClick()) {
                     alpha = Math.max(WallColor.MIN_ALPHA, alpha - WallColor.ALPHA_STEP);
                 } else if (click.isRightClick()) {
                     alpha = Math.min(WallColor.MAX_ALPHA, alpha + WallColor.ALPHA_STEP);
                 } else {
-                    return;
+                    return false;
                 }
                 current.setWallAlpha(alpha);
                 player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1, 1);
+                return true;
+            }
+            case WALLS_GLOW_SLOT -> {
+                if (!leftOrRight) return false;
+                current.setWallGlow(!current.isWallGlow());
+                player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1, 1);
+                return true;
             }
             default -> {
-                return;
+                return false;
             }
         }
-
-        saveAndRefresh(player, current, inventory);
     }
-
     private void handleBottomClick(InventoryClickEvent event, Player player, Inventory inventory) {
         ItemStack clicked = event.getCurrentItem();
         if (clicked == null || !clicked.getType().isBlock() || clicked.getType().isAir()) {
@@ -335,6 +374,22 @@ public class SettingsMenu implements Listener {
                             List.of(
                                     messageManager.getMessage("gui.lore-alpha-lmb"),
                                     messageManager.getMessage("gui.lore-alpha-rmb"))));
+
+            // --- Свечение ---
+            boolean glowOn = settings.isWallGlow();
+            String glowText =
+                    glowOn
+                            ? messageManager.getMessage("gui.status-on")
+                            : messageManager.getMessage("gui.status-off");
+            inventory.setItem(
+                    WALLS_GLOW_SLOT,
+                    createItem(
+                            glowOn ? Material.GLOW_INK_SAC : Material.INK_SAC,
+                            messageManager.getMessage("gui.glow-name").replace("%status%", glowText),
+                            List.of(
+                                    messageManager.getMessage("gui.lore-status") + glowText,
+                                    "",
+                                    messageManager.getMessage("gui.lore-glow-toggle"))));
         }
     }
 

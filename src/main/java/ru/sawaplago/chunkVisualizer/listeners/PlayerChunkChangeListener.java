@@ -154,7 +154,8 @@ public class PlayerChunkChangeListener implements Listener {
                                     chunk,
                                     player,
                                     settings.getWallColor(),
-                                    settings.getWallAlpha());
+                                    settings.getWallAlpha(),
+                                    settings.isWallGlow());
                     case BLOCKS ->
                             new ItemDisplayChunkHighlighter(
                                     chunk, player, settings.getHeights(), settings.getMaterial());

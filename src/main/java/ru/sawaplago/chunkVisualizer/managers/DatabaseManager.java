@@ -33,8 +33,8 @@ public class DatabaseManager {
                         handle.createUpdate(
                                         """
                                     INSERT OR REPLACE INTO user_settings
-                                    (playerName, heights, isEnabled, material, mode, wallColor, wallAlpha)
-                                    VALUES (:playerName, :heights, :enabled, :material, :mode, :wallColor, :wallAlpha)
+                                    (playerName, heights, isEnabled, material, mode, wallColor, wallAlpha, wallGlow)
+                                    VALUES (:playerName, :heights, :enabled, :material, :mode, :wallColor, :wallAlpha, :wallGlow)
                                 """)
                                 .bindBean(settings)
                                 .execute());
@@ -46,7 +46,7 @@ public class DatabaseManager {
                         handle.createQuery(
                                         """
                                    SELECT playerName, heights, isEnabled as enabled, material,
-                                          mode, wallColor, wallAlpha
+                                          mode, wallColor, wallAlpha, wallGlow
                                    FROM user_settings
                                    WHERE playerName = :playerName
                                 """)
@@ -88,7 +88,8 @@ public class DatabaseManager {
                                 material    TEXT,
                                 mode        TEXT DEFAULT 'BLOCKS',
                                 wallColor   TEXT DEFAULT 'RED',
-                                wallAlpha   INTEGER DEFAULT 50
+                                wallAlpha   INTEGER DEFAULT 50,
+                                wallGlow    BOOLEAN DEFAULT 0
                             )
                         """));
     }
@@ -114,6 +115,10 @@ public class DatabaseManager {
                     if (!columns.contains("wallAlpha")) {
                         handle.execute(
                                 "ALTER TABLE user_settings ADD COLUMN wallAlpha INTEGER DEFAULT 50");
+                    }
+                    if (!columns.contains("wallGlow")) {
+                        handle.execute(
+                                "ALTER TABLE user_settings ADD COLUMN wallGlow BOOLEAN DEFAULT 0");
                     }
                 });
     }

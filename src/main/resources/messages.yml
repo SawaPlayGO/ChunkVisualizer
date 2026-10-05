@@ -47,6 +47,8 @@ gui:
   alpha-name: "&eWall Opacity: &b%alpha%%"
   lore-alpha-lmb: "&eLMB: &fDecrease opacity (-5%)"
   lore-alpha-rmb: "&eRMB: &fIncrease opacity (+5%)"
+  glow-name: "&eWall Glow: %status%"
+  lore-glow-toggle: "&eClick: &fToggle glow"
   colors:
     RED: "&cRed"
     ORANGE: "&6Orange"

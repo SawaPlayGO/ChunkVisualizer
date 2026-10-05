@@ -52,4 +52,8 @@ public class ConfigManager {
         int alpha = config.getInt("settings.default-wall-alpha", 50);
         return Math.max(WallColor.MIN_ALPHA, Math.min(WallColor.MAX_ALPHA, alpha));
     }
+
+    public boolean isDefaultWallGlow() {
+        return config.getBoolean("settings.default-wall-glow", false);
+    }
 }

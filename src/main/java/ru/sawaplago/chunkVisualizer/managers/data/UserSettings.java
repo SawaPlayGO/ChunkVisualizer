@@ -21,6 +21,7 @@ public class UserSettings {
     private HighlightMode mode;
     private WallColor wallColor;
     private int wallAlpha;
+    private boolean wallGlow;
 
     public static UserSettings defaultSettings(String playerName) {
         ConfigManager configManager = ChunkVisualizer.getInstance().getConfigManager();
@@ -31,7 +32,8 @@ public class UserSettings {
                 configManager.getDefaultMaterial(),
                 configManager.getDefaultMode(),
                 configManager.getDefaultWallColor(),
-                configManager.getDefaultWallAlpha());
+                configManager.getDefaultWallAlpha(),
+                configManager.isDefaultWallGlow());
     }
 
     /** Режим с учётом прав: без chunkvisualizer.use.display всегда BLOCKS. */

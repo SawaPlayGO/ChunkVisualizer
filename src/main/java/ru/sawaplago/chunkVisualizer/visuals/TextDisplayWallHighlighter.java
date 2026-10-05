@@ -24,18 +24,24 @@ import ru.sawaplago.chunkVisualizer.objects.WallColor;
 /** Рисует 4 стенки чанка через text_display (только на клиенте игрока). */
 public class TextDisplayWallHighlighter implements ChunkHighlighter {
 
-    // Индексы метаданных Display / TextDisplay (1.20.2+)
+    // Индексы метаданных Entity / Display / TextDisplay (1.20.2+)
+    private static final int META_ENTITY_FLAGS = 0;
     private static final int META_TRANSLATION = 11;
     private static final int META_SCALE = 12;
     private static final int META_LEFT_ROTATION = 13;
     private static final int META_RIGHT_ROTATION = 14;
     private static final int META_BILLBOARD = 15;
+    private static final int META_BRIGHTNESS = 16;
     private static final int META_VIEW_RANGE = 17;
+    private static final int META_GLOW_COLOR = 22;
     private static final int META_TEXT = 23;
     private static final int META_BACKGROUND = 25;
 
+    private static final byte GLOWING_FLAG = 0x40;
     private static final byte BILLBOARD_FIXED = 0;
     private static final float VIEW_RANGE = 16f;
+    // brightness override: (block light << 4) | (sky light << 20)
+    private static final int FULL_BRIGHTNESS = (15 << 4) | (15 << 20);
     private static final Vector3f SCALE = new Vector3f(130f, 1020f, 1f);
     private static final Quaternion4f RIGHT_ROTATION = new Quaternion4f(0f, 0f, 0f, 1f);
 
@@ -71,14 +77,18 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
     private final Chunk chunk;
     private final Player player;
     private final int backgroundColor;
+    private final int glowRgb;
+    private final boolean glow;
     private final List<Integer> activeEntityIds = new ArrayList<>();
 
     public TextDisplayWallHighlighter(
-            Chunk chunk, Player player, WallColor color, int alphaPercent) {
+            Chunk chunk, Player player, WallColor color, int alphaPercent, boolean glow) {
         this.chunk = chunk;
         this.player = player;
         WallColor safeColor = color != null ? color : WallColor.RED;
         this.backgroundColor = safeColor.toArgb(alphaPercent);
+        this.glowRgb = safeColor.getRgb();
+        this.glow = glow;
     }
 
     @Override
@@ -132,6 +142,13 @@ public class TextDisplayWallHighlighter implements ChunkHighlighter {
         // width/height не отправляем: 0 = без culling по боксу
         meta.add(new EntityData<>(META_TEXT, EntityDataTypes.ADV_COMPONENT, Component.text(" ")));
         meta.add(new EntityData<>(META_BACKGROUND, EntityDataTypes.INT, backgroundColor));
+
+        if (glow) {
+            // Контур (флаг glowing) цвета стены + полная яркость, чтобы стена "светилась"
+            meta.add(new EntityData<>(META_ENTITY_FLAGS, EntityDataTypes.BYTE, GLOWING_FLAG));
+            meta.add(new EntityData<>(META_GLOW_COLOR, EntityDataTypes.INT, glowRgb));
+            meta.add(new EntityData<>(META_BRIGHTNESS, EntityDataTypes.INT, FULL_BRIGHTNESS));
+        }
 
         PacketEvents.getAPI()
                 .getPlayerManager()
